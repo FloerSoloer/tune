@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 
+	import NewTag from '$lib/components/NewTag.svelte';
+
 	let { data }: PageProps = $props();
 </script>
 
@@ -14,4 +16,5 @@
 			</p>
 		{/each}
 	{/await}
+	<NewTag />
 </main>
