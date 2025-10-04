@@ -12,12 +12,14 @@ export const pool = await createPool(
 
 const re_tag = /^[0-9a-z]([0-9a-z_]{0,30}[0-9a-z])?$/;
 
+export const z__tag = z.object({
+	cat: z.string().regex(re_tag),
+	name: z.string().regex(re_tag)
+});
+
 export const sql = createSqlTag({
 	typeAliases: {
-		tag: z.object({
-			name: z.string().regex(re_tag),
-			cat: z.string().regex(re_tag)
-		}),
+		tag: z__tag,
 		void: z.object({}).strict()
 	}
 });

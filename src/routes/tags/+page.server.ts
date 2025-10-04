@@ -1,8 +1,9 @@
-import { pool, sql } from '$lib/server/db/pool';
+import { pool, sql, z__tag } from '$lib/server/db/pool';
 import { UniqueIntegrityConstraintViolationError } from 'slonik';
 import type { Actions, PageServerLoad } from './$types';
-import { ErrorWithNotif } from '$lib/components/Notifs.store';
 import { parseErrorNotif } from '$lib/parseErrorData';
+import { ZodError } from 'zod';
+import type { TNotifParams } from '$lib/components/Notifs.store';
 
 export const load: PageServerLoad = async function () {
 	const tags = pool.any(sql.typeAlias('tag')`SELECT * FROM tag`);
@@ -20,26 +21,30 @@ export const actions = {
 
 		try {
 			const req_data = await request.formData();
-
-			const req_name = req_data.get('name');
-			if (!req_name) throw new ErrorWithNotif({ title: 'Tag name is required' });
-			// for use in error logging; dont throw, let zod throw instead
-			if (typeof req_name === 'string') tag_name = `#${req_name}`;
-
-			const req_cat = req_data.get('cat');
-			if (!req_cat) throw new ErrorWithNotif({ title: 'Tag category is required' });
+			const tag = await z__tag.parseAsync({
+				cat: req_data.get('cat'),
+				name: req_data.get('name')
+			});
+			tag_name = `#${tag.name}`;
 
 			await pool.query(
-				sql.typeAlias('void')`INSERT INTO tag (name, cat) VALUES (${req_name}, ${req_cat})`
+				sql.typeAlias('void')`INSERT INTO tag (name, cat) VALUES (${tag.name}, ${tag.cat})`
 			);
 
 			return {
-				data: { cat: req_cat, name: req_name },
+				data: tag,
 				name,
 				ok: true
 			} as const;
 		} catch (e) {
 			const data = parseErrorNotif('/tags/+page.server?/default', e, function (e) {
+				if (e instanceof ZodError) {
+					const data: TNotifParams = { title: 'Invalid fields' };
+					const invalid_fields = new Set();
+					for (const issue of e.issues) for (const field of issue.path) invalid_fields.add(field);
+					if (invalid_fields.size > 0) data.msg = Array.from(invalid_fields).toSorted().join(', ');
+					return data;
+				}
 				if (e instanceof UniqueIntegrityConstraintViolationError)
 					return { title: `${tag_name} already exists` };
 				return false;

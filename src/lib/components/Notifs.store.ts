@@ -3,6 +3,7 @@ import { Queue } from './Queue';
 
 export type TNotifParams = {
 	title?: string;
+	msg?: string;
 	/**
 	 * @default 3000
 	 */
