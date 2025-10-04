@@ -5,7 +5,7 @@ CREATE TABLE
     "qid" text UNIQUE NOT NULL,
     -- <=64-char
     "name" text NOT NULL,
-    "r_pending" boolean DEFAULT false
+    "review_pending" boolean DEFAULT false
   );
 
 CREATE TABLE
@@ -25,14 +25,14 @@ CREATE TABLE
     -- <=64-char
     "name" text NOT NULL,
     "len" smallint NOT NULL,
-    "r_pending" boolean DEFAULT false,
+    "review_pending" boolean DEFAULT false,
     -- Overall
     -- 0=bad; 1=interesting; 2=shareable; 3=performable; 4=best
-    "r_oa" smallint NULL,
+    "review_oa" smallint NULL,
     -- Composition
-    "r_comp" smallint NULL,
+    "review_comp" smallint NULL,
     -- how well title<=>music | lore | lyrical meaning
-    "r_meaning" smallint NULL
+    "review_meaning" smallint NULL
   );
 
 CREATE TABLE
@@ -47,9 +47,9 @@ CREATE TABLE
     -- "start" <= "end" AND VALUE BETWEEN 0 AND track.len
     "start" smallint DEFAULT 0,
     "end" smallint DEFAULT 0,
-    "r_pending" boolean DEFAULT false,
+    "review_pending" boolean DEFAULT false,
     -- <=512-char
-    "r" text DEFAULT '',
+    "review" text DEFAULT '',
     CONSTRAINT track_part_track_fk FOREIGN KEY ("track") REFERENCES public.track_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE
   );
 
@@ -59,9 +59,9 @@ CREATE TABLE
     "remake" int NOT NULL CHECK ("track" <> "remake"),
     -- relative to track
     -- -2=butchered; -1=worsened; 0=same; 1=improved; 2=restored
-    "r_oa" smallint NULL,
-    "r_comp" smallint NULL,
-    "r_meaning" smallint NULL,
+    "review_oa" smallint NULL,
+    "review_comp" smallint NULL,
+    "review_meaning" smallint NULL,
     CONSTRAINT track_remake_pk PRIMARY KEY ("track", "remake"),
     CONSTRAINT track_remake_track_fk FOREIGN KEY ("track") REFERENCES public.track_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT track_remake_remake_fk FOREIGN KEY ("remake") REFERENCES public.track_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE
@@ -71,7 +71,7 @@ CREATE TABLE
   public.tag (
     -- <=32-char
     "name" text PRIMARY KEY,
-    "cat" text DEFAULT 'Others'
+    "category" text DEFAULT 'Others'
   );
 
 CREATE TABLE

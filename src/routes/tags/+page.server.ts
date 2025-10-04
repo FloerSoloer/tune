@@ -22,13 +22,15 @@ export const actions = {
 		try {
 			const req_data = await request.formData();
 			const tag = await z__tag.parseAsync({
-				cat: req_data.get('cat'),
+				category: req_data.get('category'),
 				name: req_data.get('name')
 			});
 			tag_name = `#${tag.name}`;
 
 			await pool.query(
-				sql.typeAlias('void')`INSERT INTO tag (name, cat) VALUES (${tag.name}, ${tag.cat})`
+				sql.typeAlias(
+					'void'
+				)`INSERT INTO tag (name, category) VALUES (${tag.name}, ${tag.category})`
 			);
 
 			return {

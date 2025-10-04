@@ -40,7 +40,7 @@
 				<label class="validator input input-xs input-ghost px-1.5 text-sm">
 					<IconMdiBookshelf />
 					<input
-						name="cat"
+						name="category"
 						autocomplete="off"
 						pattern={`[0-9a-z]([0-9a-z_]{0,30}[0-9a-z])?`}
 						placeholder="tag_category"

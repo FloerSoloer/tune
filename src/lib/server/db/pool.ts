@@ -13,7 +13,7 @@ export const pool = await createPool(
 const re_tag = /^[0-9a-z]([0-9a-z_]{0,30}[0-9a-z])?$/;
 
 export const z__tag = z.object({
-	cat: z.string().regex(re_tag),
+	category: z.string().regex(re_tag),
 	name: z.string().regex(re_tag)
 });
 
