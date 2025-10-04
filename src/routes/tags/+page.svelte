@@ -2,8 +2,22 @@
 	import type { PageProps } from './$types';
 
 	import NewTag from '$lib/components/NewTag.svelte';
+	import { notifs } from '$lib/components/Notifs.store';
 
-	let { data }: PageProps = $props();
+	let { data, form }: PageProps = $props();
+
+	$effect(function () {
+		if (!form) return;
+		if (!form.ok) {
+			notifs.push(form.data);
+			return;
+		}
+		switch (form.name) {
+			case 'default':
+				notifs.push({ title: `Added #${form.data.name}` });
+				break;
+		}
+	});
 </script>
 
 <main class="flex flex-wrap gap-1.5">

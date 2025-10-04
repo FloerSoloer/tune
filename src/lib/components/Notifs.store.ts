@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 import { Queue } from './Queue';
 
-type TNotifParams = {
+export type TNotifParams = {
 	title?: string;
 	/**
 	 * @default 3000
@@ -63,3 +63,11 @@ function Store(max_len = 5, default_timeout_ms = 5000) {
 }
 
 export const notifs = Store();
+
+export class ErrorWithNotif extends Error {
+	data;
+	constructor(data: TNotifParams, ...args: ConstructorParameters<ErrorConstructor>) {
+		super(...args);
+		this.data = data;
+	}
+}
