@@ -4,7 +4,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { parseErrorNotif } from '$lib/parseErrorData';
 
 export const load: PageServerLoad = async function () {
-	const tags = pool.any(sql.typeAlias('tag')`SELECT * FROM tag`);
+	const tags = pool.any(sql.typeAlias('tag')`SELECT category, name FROM tag`);
 
 	return {
 		tags
