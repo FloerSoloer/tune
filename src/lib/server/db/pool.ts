@@ -10,16 +10,42 @@ export const pool = await createPool(
 	}
 );
 
-const re_tag = /^[0-9a-z]([0-9a-z_]{0,30}[0-9a-z])?$/;
+const re__tag = /^[a-z0-9]([a-z0-9_]{0,30}[a-z0-9])?$/;
 
 export const z__tag = z.object({
-	category: z.string().regex(re_tag),
-	name: z.string().regex(re_tag)
+	category: z.string().regex(re__tag),
+	name: z.string().regex(re__tag)
+});
+
+function z_Rating() {
+	return z.number().int().gte(-32768).lte(32767);
+}
+
+export const z__track_cluster = z.object({
+	qid: z.string().length(22),
+	name: z.string().min(1).max(64),
+	len: z.number().int().gte(1).lte(9999),
+	review_pending: z.boolean(),
+	review_oa: z_Rating(),
+	review_comp: z_Rating(),
+	review_meaning: z_Rating(),
+	tracks: z.array(z.string())
+});
+
+/**
+ * ? sc 27 is uncertain
+ */
+const re__track__id = /(sc:\d{1,27}|sp:[a-zA-Z0-9]{22}|yt:[a-zA-Z0-9_-]{11})(:\d{1,4}-\d{1,4})?/;
+
+export const z__track = z.object({
+	id: z.string().regex(re__track__id)
 });
 
 export const sql = createSqlTag({
 	typeAliases: {
 		tag: z__tag,
+		track: z__track,
+		track_cluster: z__track_cluster,
 		void: z.object({}).strict()
 	}
 });
