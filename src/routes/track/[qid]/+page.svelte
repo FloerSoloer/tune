@@ -13,6 +13,14 @@
 
 	const { data, form }: PageProps = $props();
 
+	let init_name = $state<string>('');
+	let init_len = $state<number>(1);
+	let init_review_pending = $state<boolean>(false);
+	let init_review_oa = $state<number>(0);
+	let init_review_comp = $state<number>(0);
+	let init_review_meaning = $state<number>(0);
+	let init_tracks = $state<string[]>(['']);
+
 	let name = $state<string>('');
 	let len = $state<number>(1);
 	let review_pending = $state<boolean>(false);
@@ -21,17 +29,27 @@
 	let review_meaning = $state<number>(0);
 	let tracks = $state<string[]>(['']);
 
+	const edited = $derived(
+		init_name !== name ||
+			init_len !== len ||
+			init_review_pending !== review_pending ||
+			init_review_oa !== review_oa ||
+			init_review_comp !== review_comp ||
+			init_review_meaning !== review_meaning ||
+			tracks.join(',') !== init_tracks.join(',')
+	);
+
 	$effect(function () {
 		(async function () {
 			const track_cluster = await data.track_cluster;
 			if (!track_cluster) return;
-			name = track_cluster.name;
-			len = track_cluster.len;
-			review_pending = track_cluster.review_pending;
-			review_oa = track_cluster.review_oa;
-			review_comp = track_cluster.review_comp;
-			review_meaning = track_cluster.review_meaning;
-			tracks = track_cluster.tracks;
+			init_name = name = track_cluster.name;
+			init_len = len = track_cluster.len;
+			init_review_pending = review_pending = track_cluster.review_pending;
+			init_review_oa = review_oa = track_cluster.review_oa;
+			init_review_comp = review_comp = track_cluster.review_comp;
+			init_review_meaning = review_meaning = track_cluster.review_meaning;
+			init_tracks = tracks = [...track_cluster.tracks];
 		})();
 	});
 
@@ -122,7 +140,11 @@
 			<IconMdiPlus />
 		</button>
 	</fieldset>
-	<button class="btn w-full max-w-xs btn-success" title="Submit" type="submit">
+	<button
+		class={{ 'btn w-full max-w-xs': true, 'btn-warning': edited, 'btn-success': !edited }}
+		title="Submit"
+		type="submit"
+	>
 		<IconMdiCheck />
 	</button>
 </form>
