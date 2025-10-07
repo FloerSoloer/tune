@@ -6,13 +6,15 @@
 	import type { PageProps } from './$types';
 	import type { MouseEventHandler } from 'svelte/elements';
 
+	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
+	import { notifs } from '$lib/components/Notifs.store';
 	import Rating from '$lib/components/Rating.svelte';
 
-	const { data }: PageProps = $props();
+	const { data, form }: PageProps = $props();
 
 	let name = $state<string>('');
-	let len = $state<number>(0);
+	let len = $state<number>(1);
 	let review_pending = $state<boolean>(false);
 	let review_oa = $state<number>(0);
 	let review_comp = $state<number>(0);
@@ -30,6 +32,14 @@
 			review_comp = track_cluster.review_comp;
 			review_meaning = track_cluster.review_meaning;
 		})();
+
+		$effect(function () {
+			if (!form) return;
+			if (!form.ok) {
+				notifs.push(form.data);
+				return;
+			}
+		});
 	});
 
 	const isOneTrack = $derived(tracks.length <= 1);
@@ -46,8 +56,16 @@
 	};
 </script>
 
-<form class="flex flex-col gap-2">
-	<input name="qid" class="hidden" type="text" value={page.params.qid} />
+<form
+	class="flex flex-col gap-2"
+	action={`/track/${page.params.qid}`}
+	method="POST"
+	use:enhance={function () {
+		return async function ({ update }) {
+			await update({ reset: false });
+		};
+	}}
+>
 	<label class="input block">
 		<span>Name</span>
 		<input name="name" required type="text" bind:value={name} />
