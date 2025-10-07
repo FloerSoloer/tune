@@ -33,14 +33,14 @@
 			review_meaning = track_cluster.review_meaning;
 			tracks = track_cluster.tracks;
 		})();
+	});
 
-		$effect(function () {
-			if (!form) return;
-			if (!form.ok) {
-				notifs.push(form.data);
-				return;
-			}
-		});
+	$effect(function () {
+		if (!form) return;
+		if (!form.ok) {
+			notifs.push(form.data);
+			return;
+		}
 	});
 
 	const isOneTrack = $derived(tracks.length <= 1);
