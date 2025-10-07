@@ -4,7 +4,7 @@
 	import IconMdiPlus from '~icons/mdi/plus';
 
 	import type { PageProps } from './$types';
-	import type { MouseEventHandler } from 'svelte/elements';
+	import type { ChangeEventHandler, MouseEventHandler } from 'svelte/elements';
 
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
@@ -46,14 +46,22 @@
 	const isOneTrack = $derived(tracks.length <= 1);
 
 	const addTrack: MouseEventHandler<HTMLButtonElement> = function () {
-		tracks.push('');
+		tracks = [...tracks, ''];
+	};
+
+	const changeTrack: ChangeEventHandler<HTMLInputElement> = function (ev) {
+		const i = ev.currentTarget.dataset.i;
+		if (!i) return;
+		const new_tracks = [...tracks];
+		new_tracks[+i] = ev.currentTarget.value;
+		tracks = new_tracks;
 	};
 
 	const maybeRemoveTrack: MouseEventHandler<HTMLButtonElement> = function (ev) {
 		if (isOneTrack) return;
 		const i = ev.currentTarget.dataset.i;
 		if (!i) return;
-		tracks.splice(+i, 1);
+		tracks = tracks.toSpliced(+i, 1);
 	};
 </script>
 
@@ -91,10 +99,12 @@
 				<input
 					name="tracks"
 					class="input join-item [border-right-style:none]"
+					data-i={i}
+					oninput={changeTrack}
 					pattern={'(sc:\\d{1,27}|sp:[a-zA-Z0-9]{22}|yt:[a-zA-Z0-9_\\-]{11})(:\\d{1,4}-\\d{1,4})?'}
 					required
 					type="text"
-					bind:value={tracks[i]}
+					value={tracks[i]}
 				/>
 				<button
 					class="btn join-item ms-0 btn-outline btn-error"
