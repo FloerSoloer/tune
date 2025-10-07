@@ -44,6 +44,7 @@ export const z__track = z.object({
 
 export const sql = createSqlTag({
 	typeAliases: {
+		id: z.number(),
 		tag: z__tag,
 		track: z__track,
 		track_cluster: z__track_cluster,

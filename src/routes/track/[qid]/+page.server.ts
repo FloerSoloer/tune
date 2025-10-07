@@ -8,20 +8,22 @@ export const load: PageServerLoad = async function ({ params }) {
 	const { qid } = params;
 
 	const track_cluster = pool.maybeOne(
-		sql.typeAlias('track_cluster')`SELECT
-	track_cluster.name,
-	track_cluster.len,
-	track_cluster.review_pending,
-	track_cluster.review_oa,
-	track_cluster.review_comp,
-	track_cluster.review_meaning,
-	(
-		SELECT ARRAY_AGG(track.id)
-		FROM track
-		WHERE track.cluster = track_cluster.id
-	) tracks
-FROM track_cluster
-WHERE track_cluster.qid = ${qid}`
+		sql.typeAlias('track_cluster')`
+			SELECT
+				track_cluster.name,
+				track_cluster.len,
+				track_cluster.review_pending,
+				track_cluster.review_oa,
+				track_cluster.review_comp,
+				track_cluster.review_meaning,
+				(
+					SELECT ARRAY_AGG(track.id)
+					FROM track
+					WHERE track.cluster = track_cluster.id
+				) tracks
+			FROM track_cluster
+			WHERE track_cluster.qid = ${qid}
+`
 	);
 
 	return {
@@ -58,7 +60,55 @@ export const actions = {
 				tracks: req_data.getAll('tracks')
 			});
 
-			console.log('/track/[qid]/+page.server?/default', track_cluster);
+			const track_cluster_query = sql.typeAlias('id')`
+				INSERT INTO track_cluster (
+					qid,
+					name,
+					len,
+					review_pending,
+					review_oa,
+					review_comp,
+					review_meaning
+				) VALUES (
+					${track_cluster.qid},
+					${track_cluster.name},
+					${track_cluster.len},
+					${track_cluster.review_pending},
+					${track_cluster.review_oa},
+					${track_cluster.review_comp},
+					${track_cluster.review_meaning}
+				)
+				ON CONFLICT (qid) DO UPDATE SET
+					qid = excluded.qid,
+					name = excluded.name,
+					len = excluded.len,
+					review_pending = excluded.review_pending,
+					review_oa = excluded.review_oa,
+					review_comp = excluded.review_comp,
+					review_meaning = excluded.review_meaning
+				RETURNING track_cluster.id
+			`;
+
+			await pool.transaction(async function (tx) {
+				const cluster_id = await tx.oneFirst(track_cluster_query);
+
+				const unnest_cluster = [];
+
+				for (const track of track_cluster.tracks) unnest_cluster.push([track, cluster_id]);
+				const tracks_query = sql.typeAlias('void')`
+					WITH tracks AS (
+						INSERT INTO track (id, cluster)
+						SELECT * FROM ${sql.unnest(unnest_cluster, ['text', 'int4'])}
+						ON CONFLICT (id) DO UPDATE SET
+							cluster = excluded.cluster
+						RETURNING track.id
+					)
+					DELETE FROM track WHERE
+						cluster = ${cluster_id} AND
+						NOT EXISTS (SELECT 1 FROM tracks WHERE track.id = tracks.id)
+				`;
+				await tx.query(tracks_query);
+			});
 
 			return { name, ok: true } as const;
 		} catch (e) {

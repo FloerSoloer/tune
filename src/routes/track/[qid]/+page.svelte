@@ -19,7 +19,7 @@
 	let review_oa = $state<number>(0);
 	let review_comp = $state<number>(0);
 	let review_meaning = $state<number>(0);
-	const tracks = $state<string[]>(['']);
+	let tracks = $state<string[]>(['']);
 
 	$effect(function () {
 		(async function () {
@@ -31,6 +31,7 @@
 			review_oa = track_cluster.review_oa;
 			review_comp = track_cluster.review_comp;
 			review_meaning = track_cluster.review_meaning;
+			tracks = track_cluster.tracks;
 		})();
 
 		$effect(function () {
