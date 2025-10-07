@@ -91,6 +91,7 @@
 				<input
 					name="tracks"
 					class="input join-item [border-right-style:none]"
+					pattern={'(sc:\\d{1,27}|sp:[a-zA-Z0-9]{22}|yt:[a-zA-Z0-9_\\-]{11})(:\\d{1,4}-\\d{1,4})?'}
 					required
 					type="text"
 					bind:value={tracks[i]}
