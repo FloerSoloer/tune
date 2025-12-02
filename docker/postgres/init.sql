@@ -12,9 +12,9 @@ CREATE TABLE
   public.band_member (
     "band" int NOT NULL,
     "member" int NOT NULL,
-    CONSTRAINT band_pk PRIMARY KEY ("band", "member"),
-    CONSTRAINT band_id_fk FOREIGN KEY ("band") REFERENCES public.artist_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT band_member_fk FOREIGN KEY ("member") REFERENCES public.artist_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY ("band", "member"),
+    FOREIGN KEY ("band") REFERENCES public.artist_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY ("member") REFERENCES public.artist_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE
   );
 
 CREATE TABLE
@@ -50,7 +50,7 @@ CREATE TABLE
     "review_pending" boolean DEFAULT false,
     -- <=512-char
     "review" text DEFAULT '',
-    CONSTRAINT track_part_track_fk FOREIGN KEY ("track") REFERENCES public.track_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY ("track") REFERENCES public.track_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE
   );
 
 CREATE TABLE
@@ -63,9 +63,9 @@ CREATE TABLE
     "review_oa" smallint NULL,
     "review_comp" smallint NULL,
     "review_meaning" smallint NULL,
-    CONSTRAINT track_remake_pk PRIMARY KEY ("track", "remake"),
-    CONSTRAINT track_remake_track_fk FOREIGN KEY ("track") REFERENCES public.track_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT track_remake_remake_fk FOREIGN KEY ("remake") REFERENCES public.track_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY ("track", "remake"),
+    FOREIGN KEY ("track") REFERENCES public.track_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY ("remake") REFERENCES public.track_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE
   );
 
 CREATE TABLE
@@ -80,7 +80,8 @@ CREATE TABLE
     "tag" text NOT NULL,
     "super" text NOT NULL,
     PRIMARY KEY ("tag", "super"),
-    FOREIGN KEY ("tag", "super") REFERENCES public.tag ("name", "name") ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY ("tag") REFERENCES public.tag ("name") ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY ("super") REFERENCES public.tag ("name") ON DELETE CASCADE ON UPDATE CASCADE
   );
 
 CREATE TABLE
@@ -89,7 +90,7 @@ CREATE TABLE
     -- [sc|sp|yt]:<id>
     "id" text PRIMARY KEY,
     "cluster" int NOT NULL,
-    CONSTRAINT artist_artist_cluster_fk FOREIGN KEY ("cluster") REFERENCES public.artist_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY ("cluster") REFERENCES public.artist_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE
   );
 
 CREATE TABLE
@@ -98,23 +99,23 @@ CREATE TABLE
     -- [sc|sp|yt]:<id>:<start>-<end>
     "id" text PRIMARY KEY,
     "cluster" int NOT NULL,
-    CONSTRAINT track_track_cluster_fk FOREIGN KEY ("cluster") REFERENCES public.track_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY ("cluster") REFERENCES public.track_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE
   );
 
 CREATE TABLE
   public.track_artist (
     "track" int NOT NULL,
     "artist" int NOT NULL,
-    CONSTRAINT track_artist_pk PRIMARY KEY ("track", "artist"),
-    CONSTRAINT track_artist_artist_cluster_fk FOREIGN KEY ("artist") REFERENCES public.artist_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT track_artist_track_cluster_fk FOREIGN KEY ("track") REFERENCES public.track_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY ("track", "artist"),  
+    FOREIGN KEY ("artist") REFERENCES public.artist_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY ("track") REFERENCES public.track_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE
   );
 
 CREATE TABLE
   public.part_tag (
     "part" int NOT NULL,
     "tag" text NOT NULL,
-    CONSTRAINT part_tag_pk PRIMARY KEY ("part", "tag"),
-    CONSTRAINT part_tag_tag_fk FOREIGN KEY ("tag") REFERENCES public.tag ("name") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT part_tag_part_fk FOREIGN KEY ("part") REFERENCES public.track_part ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY ("part", "tag"),
+    FOREIGN KEY ("tag") REFERENCES public.tag ("name") ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY ("part") REFERENCES public.track_part ("id") ON DELETE CASCADE ON UPDATE CASCADE
   );
