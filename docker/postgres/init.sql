@@ -11,7 +11,7 @@ CREATE TABLE
 CREATE TABLE
   public.band_member (
     "band" int NOT NULL,
-    "member" int NOT NULL CHECK ("band" <> "member"),
+    "member" int NOT NULL,
     CONSTRAINT band_pk PRIMARY KEY ("band", "member"),
     CONSTRAINT band_id_fk FOREIGN KEY ("band") REFERENCES public.artist_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT band_member_fk FOREIGN KEY ("member") REFERENCES public.artist_cluster ("id") ON DELETE CASCADE ON UPDATE CASCADE
@@ -56,7 +56,7 @@ CREATE TABLE
 CREATE TABLE
   public.track_remake (
     "track" int NOT NULL,
-    "remake" int NOT NULL CHECK ("track" <> "remake"),
+    "remake" int NOT NULL,
     "review_pending" boolean DEFAULT false,
     -- relative to track
     -- -2=butchered; -1=worsened; 0=same; 1=improved; 2=restored
