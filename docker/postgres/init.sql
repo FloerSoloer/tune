@@ -76,6 +76,14 @@ CREATE TABLE
   );
 
 CREATE TABLE
+  public.tag_super (
+    "tag" text NOT NULL,
+    "super" text NOT NULL,
+    PRIMARY KEY ("tag", "super"),
+    FOREIGN KEY ("tag", "super") REFERENCES public.tag ("name", "name") ON DELETE CASCADE ON UPDATE CASCADE
+  );
+
+CREATE TABLE
   public.artist (
     -- <=30-char External ID (YT, Spotify, SoundCloud)
     -- [sc|sp|yt]:<id>
