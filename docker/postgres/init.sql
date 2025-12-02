@@ -57,6 +57,7 @@ CREATE TABLE
   public.track_remake (
     "track" int NOT NULL,
     "remake" int NOT NULL CHECK ("track" <> "remake"),
+    "review_pending" boolean DEFAULT false,
     -- relative to track
     -- -2=butchered; -1=worsened; 0=same; 1=improved; 2=restored
     "review_oa" smallint NULL,
